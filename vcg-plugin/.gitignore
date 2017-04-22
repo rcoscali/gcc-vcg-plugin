@@ -6,8 +6,28 @@
 *.so
 *.so.*
 
-# Libtool dirs
+# Libtool files & dirs
 .libs
+libtool
+compile
+
+# Configure files
+Makefile
+config.log
+config.status
+configure
+config.h
+
+# Autoheader files
+stamp-h1
+
+# Automake files & dirs
+missing
+autom4te.cache/
+Makefile.in
+
+# Aclocal files
+aclocal.m4
 
 # Deps dirs
 .deps
@@ -15,7 +35,3 @@
 # Backups
 *~
 \#*
-
-# Generated
-Makefile
-Makefile.in
