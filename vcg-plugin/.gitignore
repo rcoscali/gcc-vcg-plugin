@@ -23,7 +23,7 @@ stamp-h1
 
 # Automake files & dirs
 missing
-autom4te.cache/
+autom4te.cache
 Makefile.in
 
 # Aclocal files
