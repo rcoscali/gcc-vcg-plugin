@@ -19,25 +19,27 @@ GCCPLUGINS_DIR = `gcc -print-file-name=plugin`
 
 INCLUDES = -I $(GCCPLUGINS_DIR)/include -I $(srcdir)/../libgdl $(GMP_INC)
 
-AM_CFLAGS = -Wall
+AM_CFLAGS = -Wall -Wno-write-strings
+AM_CXXFLAGS = -Wall -Wno-write-strings
+AM_CPPFLAGS = -Wall -Wno-write-strings
 
 pkglib_LTLIBRARIES = vcg_plugin.la
 
 EXTRA_DIST = vcg_plugin.gdbinit
 
 vcg_plugin_la_SOURCES = \
-	gcc-bb.c \
-	gcc-dominance.c \
-	gcc-cgraph.c \
-	gcc-function.c \
-	gcc-gimple-hierarchy.c \
-	gcc-loop.c \
-	gcc-passes.c \
-	gcc-plugin-api.c \
-	gcc-rtx.c \
-	gcc-tree-4.6.c gcc-tree-4.7.c \
-	gcc-tree-hierarchy.c \
-        vcg-plugin.c vcg-plugin.h
+	gcc-bb.cc \
+	gcc-dominance.cc \
+	gcc-cgraph.cc \
+	gcc-function.cc \
+	gcc-gimple-hierarchy.cc \
+	gcc-loop.cc \
+	gcc-passes.cc \
+	gcc-plugin-api.cc \
+	gcc-rtx.cc \
+	gcc-tree-4.6.cc gcc-tree-4.7.cc \
+	gcc-tree-hierarchy.cc \
+        vcg-plugin.cc vcg-plugin.h
 
 vcg_plugin_la_LDFLAGS = -module
 
