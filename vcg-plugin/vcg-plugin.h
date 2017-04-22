@@ -19,7 +19,9 @@
 #define VCG_PLUGIN_H
 
 /* GNU extensions, asprintf etc.  */
-#define _GNU_SOURCE
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE 1
+#endif
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -34,12 +36,20 @@
 #include "plugin-version.h"
 
 #include "tree.h"
+#include "tree-ssa-alias.h"
+#include "basic-block.h"
+#include "gimple-expr.h"
 #include "gimple.h"
-#include "tree-flow.h"
+#include "gimple-pretty-print.h"
+#include "tree-cfg.h"
 #include "tree-pass.h"
 #include "cfgloop.h"
 #include "cgraph.h"
 #include "options.h"
+#include "dominance.h"
+#include "pass_manager.h"
+#include "context.h"
+#include "rtl.h"
 
 /* Check gcc version.  */
 
@@ -56,6 +66,8 @@
 
 /* libgdl */
 #include "gdl.h"
+
+#define n_basic_blocks		(cfun->cfg->x_n_basic_blocks)
 
 /* The common data and functions for each dump/view command.  */
 
