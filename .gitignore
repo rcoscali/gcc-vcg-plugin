@@ -16,13 +16,14 @@ Makefile
 config.log
 config.status
 configure
+config.h
 
 # Autoheader files
 stamp-h1
 
 # Automake files & dirs
 missing
-autom4te.cache
+autom4te.cache/
 Makefile.in
 
 # Aclocal files
@@ -33,6 +34,4 @@ aclocal.m4
 
 # Backups
 *~
-#*
-
-# Generated
+\#*
