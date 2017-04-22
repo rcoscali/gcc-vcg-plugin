@@ -1,0 +1,21 @@
+# Objects
+*.la
+*.lo
+*.a
+*.o
+*.so
+*.so.*
+
+# Libtool dirs
+.libs
+
+# Deps dirs
+.deps
+
+# Backups
+*~
+\#*
+
+# Generated
+Makefile
+Makefile.in
