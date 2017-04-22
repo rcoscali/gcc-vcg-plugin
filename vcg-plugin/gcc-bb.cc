@@ -1,6 +1,6 @@
-/* Dump or view gcc loop.
+/* Dump or view gcc basic blocks.
  
-   Copyright (C) 2011 Mingjie Xing, mingjie.xing@gmail.com.
+   Copyright (C) 2010, 2011 Mingjie Xing, mingjie.xing@gmail.com.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,8 +24,9 @@ static char **bb_graph_title;
 static char **bb_graph_label;
 static char **bb_node_title;
 
-/* Initialize all of the names.  */
+static int *bb_index;
 
+/* Initialize all of the names.  */
 static void
 create_names (void)
 {
@@ -97,7 +98,7 @@ create_bb_graph (basic_block bb)
   gdl_set_graph_shape (g, "ellipse");
 
   rewind (vcg_plugin_common.stream);
-  gimple_dump_bb (bb, vcg_plugin_common.stream, 0, TDF_VOPS|TDF_MEMSYMS|TDF_BLOCKS);
+  gimple_dump_bb (vcg_plugin_common.stream, bb, 0, TDF_VOPS|TDF_MEMSYMS|TDF_BLOCKS);
   i = vcg_plugin_common.stream_buf_size;
   while (i > 1 && ISSPACE (vcg_plugin_common.stream_buf[i - 1])) i--;
   str = xstrndup (vcg_plugin_common.stream_buf, i);
@@ -107,12 +108,41 @@ create_bb_graph (basic_block bb)
   return g;
 }
 
-/* Dump the loop into the file.  */
+void
+parse_bb_list (char *list)
+{
+  char *s, *t;
+  int i, m, n;
+
+  s = list;
+
+  while (s && *s != '\0')
+    {
+      while (! ISDIGIT (*s) && *s != '\0') s++;
+
+      if (*s == '\0')
+        break;
+
+      n = m = (int) strtol (s, &t, 10);
+
+      if (*t == ':')
+        {
+           s = t + 1;
+           n = (int) strtol (s, &t, 10);
+        }
+
+      // printf ("m = %d    n = %d\n", m, n);
+      s = t;
+
+      n = n < n_basic_blocks - 1 ? n : n_basic_blocks - 1;
+      for (i = m; i <= n; i++)
+        bb_index [i] = 1;
+    }
+}
 
 static void
-dump_loop_to_file (char *fname, int loop_id)
+dump_bb_to_file (char *fname, char *list)
 {
-  struct loop *loop;
   basic_block bb;
   edge e;
   edge_iterator ei;
@@ -120,25 +150,24 @@ dump_loop_to_file (char *fname, int loop_id)
   gdl_graph *graph, *bb_graph;
   gdl_edge *edge;
 
-  if (loop_id >= number_of_loops ())
-    goto done;
+  bb_index = XCNEWVEC (int, n_basic_blocks);
+  parse_bb_list (list);
+
+  /* Create names for graphs and nodes.  */
+  create_names ();
 
   graph = vcg_plugin_common.top_graph;
 
-  loop = get_loop (loop_id);
-
-  create_names ();
-
   mark_dfs_back_edges ();
 
-  FOR_ALL_BB (bb)
-    if (flow_bb_inside_loop_p (loop, bb))
+  FOR_ALL_BB_FN (bb, cfun)
+    if (bb_index[bb->index])
       {
         bb_graph = create_bb_graph (bb);
         gdl_add_subgraph (graph, bb_graph);
 
         FOR_EACH_EDGE (e, ei, bb->succs)
-          if (flow_bb_inside_loop_p (loop, e->dest))
+          if (bb_index[e->dest->index])
             {
               edge = gdl_new_graph_edge (graph,
                                          bb_graph_title[e->src->index],
@@ -148,33 +177,33 @@ dump_loop_to_file (char *fname, int loop_id)
             }
       }
 
-done:
   vcg_plugin_common.dump (fname);
 
   /* Free names for graphs and nodes.  */
   free_names ();
+  free (bb_index);
 }
 
-/* Public function to dump a loop.  */
+/* Public function to dump gcc basic blocks.  */
 
 void
-vcg_plugin_dump_loop (unsigned loop_id)
+vcg_plugin_dump_bb (char *list)
 {
   vcg_plugin_common.init ();
 
-  dump_loop_to_file ("dump-loop.vcg", loop_id);
+  dump_bb_to_file ("dump-bb.vcg", list);
 
   vcg_plugin_common.finish ();
 }
 
-/* Public function to view a loop.  */
+/* Public function to view basic blocks.  */
 
 void
-vcg_plugin_view_loop (unsigned loop_id)
+vcg_plugin_view_bb (char *list)
 {
   vcg_plugin_common.init ();
 
-  dump_loop_to_file (vcg_plugin_common.temp_file_name, loop_id);
+  dump_bb_to_file (vcg_plugin_common.temp_file_name, list);
   vcg_plugin_common.show (vcg_plugin_common.temp_file_name);
 
   vcg_plugin_common.finish ();

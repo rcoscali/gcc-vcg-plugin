@@ -42,11 +42,11 @@ find_string (struct cgraph_node *node, char *prefix)
   char *str;
 
   if (prefix == NULL)
-    sprintf (buf, "%s", cgraph_node_name (node));
+    sprintf (buf, "%s",  node->name());
   else
-    sprintf (buf, "%s.%s", prefix, (char *) cgraph_node_name (node));
+    sprintf (buf, "%s.%s", prefix, (char *) node->name());
 
-  str = htab_find (string_table, buf);
+  str = (char *)htab_find (string_table, buf);
   if (str == NULL)
     {
       vcg_plugin_common.buf_print ("%s", buf);
@@ -115,7 +115,7 @@ create_node_and_edges_specific (gdl_graph *graph, struct cgraph_node *node, int 
   prefix = find_string (node, NULL);
   create_node (graph, node, prefix);
 
-  stack = XNEWVEC (struct cgraph_edge *, cgraph_n_nodes + 1);
+  stack = XNEWVEC (struct cgraph_edge *, symtab->cgraph_count + 1);
   sp = 0;
 
   if (callee_p)
@@ -174,12 +174,12 @@ static void
 dump_cgraph_to_file_specific (char *fname, int callee_p)
 {
   gdl_graph *graph;
-  struct cgraph_node *node;
+  cgraph_node *node;
 
   graph = vcg_plugin_common.top_graph;
   gdl_set_graph_orientation (graph, "left_to_right");
 
-  for (node = cgraph_nodes; node; node = node->next)
+  FOR_EACH_FUNCTION (node)
     create_node_and_edges_specific (graph, node, callee_p);
 
   vcg_plugin_common.dump (fname);
@@ -197,7 +197,7 @@ dump_cgraph_to_file (char *fname)
   graph = vcg_plugin_common.top_graph;
   gdl_set_graph_orientation (graph, "left_to_right");
 
-  for (node = cgraph_nodes; node; node = node->next)
+  FOR_EACH_FUNCTION (node)
     {
       /* Don't create the single node.  */
       if (!node->callees && !node->callers)

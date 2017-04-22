@@ -93,7 +93,7 @@ create_bb_graph (basic_block bb)
   gdl_set_graph_shape (g, "ellipse");
 
   rewind (vcg_plugin_common.stream);
-  gimple_dump_bb (bb, vcg_plugin_common.stream, 0, TDF_VOPS|TDF_MEMSYMS|TDF_BLOCKS);
+  gimple_dump_bb (vcg_plugin_common.stream, bb, 0, TDF_VOPS|TDF_MEMSYMS|TDF_BLOCKS);
   i = vcg_plugin_common.stream_buf_size;
   while (i > 1 && ISSPACE (vcg_plugin_common.stream_buf[i - 1])) i--;
   str = xstrndup (vcg_plugin_common.stream_buf, i);
@@ -143,8 +143,8 @@ set_vertical_order (gdl_graph *graph)
 
   distance = XCNEWVEC (int, n_basic_blocks);
 
-  max = set_vertical_order_1 (graph, distance, EXIT_BLOCK_PTR);
-  FOR_EACH_BB (bb)
+  max = set_vertical_order_1 (graph, distance, EXIT_BLOCK_PTR_FOR_FN(cfun));
+  FOR_EACH_BB_FN (bb, cfun)
     {
       if (distance[bb->index] == 0)
         {
@@ -153,7 +153,7 @@ set_vertical_order (gdl_graph *graph)
         }
     }
   subgraph = gdl_find_subgraph (graph,
-                                bb_graph_title[EXIT_BLOCK_PTR->index]); 
+                                bb_graph_title[EXIT_BLOCK_PTR_FOR_FN(cfun)->index]); 
   gdl_set_graph_vertical_order (subgraph, max);
   node = gdl_get_graph_node (subgraph);
   gdl_set_node_vertical_order (node, max);
@@ -178,7 +178,7 @@ dump_function_to_file (char *fname)
 
   mark_dfs_back_edges ();
 
-  FOR_ALL_BB (bb)
+  FOR_ALL_BB_FN (bb, cfun)
     {
       bb_graph = create_bb_graph (bb);
       gdl_add_subgraph (graph, bb_graph);

@@ -53,7 +53,7 @@ dump_rtx_to_file (char *fname, const_rtx x)
   
   buf_print_rtx (x);
   vcg_plugin_common.buf_print ("----------\n");
-  vcg_plugin_common.buf_print ("addr: 0x%x\n", (unsigned) x);
+  vcg_plugin_common.buf_print ("addr: 0x%lx\n", (unsigned long) x);
   vcg_plugin_common.buf_print ("format: %s\n", format_ptr);
   vcg_plugin_common.buf_print ("----------\n");
   vcg_plugin_common.buf_print ("code: %d\n", x->code);
@@ -264,7 +264,7 @@ dump_rtx_to_file (char *fname, const_rtx x)
         sub = XEXP (x, i);
         vcg_plugin_common.buf_print ("fld[%d]\n", i);
         vcg_plugin_common.buf_print ("format: u\n");
-        vcg_plugin_common.buf_print ("rt_rtx: 0x%x", (unsigned) sub);
+        vcg_plugin_common.buf_print ("rt_rtx: 0x%lx", (unsigned long) sub);
         if (sub)
           {
             vcg_plugin_common.buf_print ("\n");

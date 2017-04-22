@@ -29,8 +29,8 @@ dump_dominance_to_file (char *fname)
 
   graph = vcg_plugin_common.top_graph;
 
-  FOR_EACH_BB (bb)
-    if ((bb2 = get_immediate_dominator (1, bb)))
+  FOR_EACH_BB_FN (bb, cfun)
+    if ((bb2 = get_immediate_dominator (CDI_DOMINATORS, bb)))
       {
         sprintf (buf, "bb %d", bb->index);
         sprintf (buf2, "bb %d", bb2->index);

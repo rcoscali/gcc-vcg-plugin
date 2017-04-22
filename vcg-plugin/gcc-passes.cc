@@ -111,7 +111,7 @@ create_sub_pass_list_graph (gdl_graph *graph, struct opt_pass *pass_list,
   gdl_set_graph_shape (subgraph, "ellipse");
   gdl_add_subgraph (graph, subgraph);
 
-  if (pass->execute)
+  if (pass->execute(cfun))
     {
       node = create_node (subgraph, pass, NULL);
       gdl_set_node_label (node, label);
@@ -171,7 +171,8 @@ create_pass_list_graph (gdl_graph *graph, struct opt_pass *pass_list,
 static void
 dump_passes_to_file (char *fname)
 {
-  gdl_graph *graph, *g;
+  gcc::pass_manager *passes = g->get_passes ();
+  gdl_graph *graph, *gr;
   int i;
 
   graph = vcg_plugin_common.top_graph;
@@ -182,17 +183,20 @@ dump_passes_to_file (char *fname)
   this_node = NULL;
 
   for (i = 0; i < PASS_LIST_NUM; i++)
-    create_pass_list_graph (graph, *gcc_pass_lists[i], pass_list_name[i], NULL);
+    create_pass_list_graph (graph,
+                            passes->passes_by_id [i],
+                            (char *)passes->passes_by_id[i]->name,
+                            NULL);
 
   if (this_node)
     {
       gdl_set_node_color (this_node, "red");
-      g = gdl_get_node_parent (this_node);
-      while (g && g != graph)
+      gr = gdl_get_node_parent (this_node);
+      while (gr && gr != graph)
         {
-          gdl_set_graph_color (g, "red");
-          gdl_set_graph_folding (g, 0);
-          g = gdl_get_graph_parent (g);
+          gdl_set_graph_color (gr, "red");
+          gdl_set_graph_folding (gr, 0);
+          gr = gdl_get_graph_parent (gr);
         }
     }
   vcg_plugin_common.dump (fname);
