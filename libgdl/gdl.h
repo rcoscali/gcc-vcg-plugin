@@ -20,6 +20,10 @@
 
 #include <assert.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* shape */
 
 #define GDL_BOX			"box"
@@ -287,5 +291,9 @@ extern gdl_graph *gdl_find_subgraph (gdl_graph *graph, char *title);
 extern void gdl_dump_node (FILE *fout, gdl_node *node);
 extern void gdl_dump_edge (FILE *fout, gdl_edge *edge);
 extern void gdl_dump_graph (FILE *fout, gdl_graph *graph);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
